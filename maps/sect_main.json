@@ -1,6 +1,6 @@
 {
   "id": "sect_main",
-  "name": "宗门大殿",
+  "name": "青云宗·演武场",
   "tiles": [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -21,13 +21,17 @@
   ],
   "collision_tiles": [1],
   "enemies": [
-    {"type": "spirit_rat", "pos": [5, 5]},
-    {"type": "spirit_rat", "pos": [14, 8]},
-    {"type": "demon_cultivator", "pos": [10, 12]}
+    {"type": "bamboo_demon", "pos": [4, 4]},
+    {"type": "bamboo_demon", "pos": [15, 4]},
+    {"type": "skeleton_general", "pos": [10, 8]}
   ],
   "portals": [],
-  "items": [],
-  "npcs": [],
+  "items": [
+    {"type": "hp_potion", "pos": [5, 10]}
+  ],
+  "npcs": [
+    {"id": "master", "pos": [10, 2], "dialogue": "master_greeting"}
+  ],
   "music": "",
   "realm_require": ""
 }
