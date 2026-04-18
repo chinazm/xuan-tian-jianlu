@@ -1,0 +1,17 @@
+{
+  "window": {
+    "width": 800,
+    "height": 600,
+    "title": "玄天剑录",
+    "fps": 60,
+    "fullscreen": false
+  },
+  "render": {
+    "tile_size": 32,
+    "camera_smooth": 0.1
+  },
+  "game": {
+    "default_player_name": "林凡",
+    "max_save_slots": 3
+  }
+}
