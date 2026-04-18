@@ -83,3 +83,12 @@ class CultivationSystem:
         if required == 0:
             return 1.0
         return min(1.0, self.lingli / required)
+
+    def has_realms(self) -> bool:
+        return bool(self._realms)
+
+    def find_realm_index(self, realm_name: str) -> int:
+        for idx, realm_data in enumerate(self._realms):
+            if realm_data.get("name") == realm_name:
+                return idx
+        return 0

@@ -12,13 +12,8 @@ from core.touch_controller import TouchController
 from core.performance import DynamicFPS
 from core.android_adapter import AndroidAdapter
 
-# Android 返回键映射 (python-for-android 的 android.keys 模块)
-try:
-    from android.keys import KEYCODE_BACK
-    HAS_ANDROID_KEYS = True
-except ImportError:
-    KEYCODE_BACK = 4  # Android KEYCODE_BACK 默认值
-    HAS_ANDROID_KEYS = False
+ANDROID_BACK_KEY_FALLBACK = 4
+ANDROID_BACK_KEY = getattr(pygame, "K_AC_BACK", ANDROID_BACK_KEY_FALLBACK)
 from world.tilemap import Tilemap
 from world.room import Room
 from entities.player import Player
@@ -116,7 +111,8 @@ class GameScene(Scene):
         EventBus.unsubscribe("entity_die", self._on_entity_die)
         EventBus.unsubscribe("item_pickup", self._on_item_pickup)
         EventBus.unsubscribe("level_up", self._on_level_up)
-        self.android.release_wakelock()
+        if hasattr(self, "android") and self.android:
+            self.android.release_wakelock()
         super().on_exit()
     
     def _check_android(self):
@@ -226,7 +222,7 @@ class GameScene(Scene):
         
         # Android 返回键处理
         if event.type == pygame.KEYDOWN:
-            if event.key in (getattr(pygame, "K_AC_BACK", KEYCODE_BACK), KEYCODE_BACK):  # Android BACK 键
+            if event.key == ANDROID_BACK_KEY:  # Android BACK 键
                 if self._state == GameState.PLAYING:
                     self._set_state(GameState.PAUSED)
                 elif self._state == GameState.PAUSED:
@@ -286,7 +282,7 @@ class GameScene(Scene):
         # 背包关闭
         if self._state == GameState.INVENTORY:
             selected_idx = self.inventory_ui.selected_item_index
-            items = getattr(self.inventory, "_items", [])
+            items = self.inventory.get_items()
             if selected_idx is not None and 0 <= selected_idx < len(items):
                 item_id = items[selected_idx].item_id
                 effect = self.inventory.use_item(item_id)
@@ -448,8 +444,8 @@ class GameScene(Scene):
             current_hp=self.player.current_hp,
             current_room=self._room_id,
             player_pos=[self.player.pos.x, self.player.pos.y],
-            inventory=[{"item_id": i.item_id, "quantity": i.quantity} for i in getattr(self.inventory, "_items", [])],
-            equipment={slot: eq.item_id for slot, eq in getattr(self.inventory, "_equipment_slots", {}).items() if eq},
+            inventory=[{"item_id": i.item_id, "quantity": i.quantity} for i in self.inventory.get_items()],
+            equipment=self.inventory.get_equipment_mapping(),
             lingshi=self.inventory.lingshi,
             completed_quests=list(self.quest.completed_quests),
             play_time=self.play_time,
@@ -468,27 +464,22 @@ class GameScene(Scene):
             else:
                 self.player.pos = Vector2(data.player_pos[0], data.player_pos[1])
 
-            self.player.current_hp = max(0, min(data.current_hp, data.max_hp))
             self.player.max_hp = data.max_hp
+            self.player.current_hp = max(0, min(data.current_hp, self.player.max_hp))
 
             target_realm = data.realm
-            self.cultivation.current_realm_index = 0
-            for idx, realm_data in enumerate(getattr(self.cultivation, "_realms", [])):
-                if realm_data.get("name") == target_realm:
-                    self.cultivation.current_realm_index = idx
-                    break
+            self.cultivation.current_realm_index = self.cultivation.find_realm_index(target_realm)
             self.cultivation.realm_level = data.realm_level
             self.cultivation.lingli = data.lingli
             self.inventory.lingshi = data.lingshi
             self.play_time = data.play_time
 
-            getattr(self.inventory, "_items", []).clear()
+            self.inventory.clear_items()
             for item in data.inventory:
                 self.inventory.add_item(item.get("item_id", ""), int(item.get("quantity", 1)))
 
-            for slot_name in list(getattr(self.inventory, "_equipment_slots", {}).keys()):
-                self.inventory._equipment_slots[slot_name] = None
-            for _, equip_id in data.equipment.items():
+            self.inventory.clear_equipment()
+            for slot_name, equip_id in data.equipment.items():
                 self.inventory.equip(equip_id)
 
             self.quest.completed_quests = list(data.completed_quests)
@@ -510,7 +501,7 @@ class GameScene(Scene):
             self.cultivation.lingli = min(required, self.cultivation.lingli + float(effect["mp_restore"]))
 
     def _current_realm_required_lingli(self) -> float:
-        if not getattr(self.cultivation, "_realms", []):
+        if not self.cultivation.has_realms():
             return 100.0
         exp_list = self.cultivation.current_realm_data.get("exp_to_next", [])
         if not exp_list or self.cultivation.realm_level > len(exp_list):
