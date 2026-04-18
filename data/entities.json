@@ -1,0 +1,30 @@
+{
+  "player": {
+    "name": "主角",
+    "size": [32, 32],
+    "max_hp": 100,
+    "base_speed": 120,
+    "sprite_sheet": "sprites/player.png"
+  },
+  "slime": {
+    "name": "史莱姆",
+    "size": [32, 32],
+    "max_hp": 30,
+    "base_speed": 40,
+    "sprite_sheet": "sprites/enemy_slime.png"
+  },
+  "skeleton": {
+    "name": "骷髅兵",
+    "size": [32, 32],
+    "max_hp": 60,
+    "base_speed": 60,
+    "sprite_sheet": "sprites/enemy_skeleton.png"
+  },
+  "demon": {
+    "name": "魔修",
+    "size": [32, 32],
+    "max_hp": 150,
+    "base_speed": 80,
+    "sprite_sheet": "sprites/enemy_demon.png"
+  }
+}
