@@ -97,13 +97,27 @@ class GameScene(Scene):
         self.player: Player = None
         self.enemies: list[Enemy] = []
         self.tilemap: Tilemap = None
+        self.room: Room = None
+        self._room_items: list[dict] = []
+        self._room_npcs: list[dict] = []
+        self._awarded_quests: set[str] = set()
         self.paused = False
         self.play_time = 0.0
 
     def on_enter(self):
         super().on_enter()
+        EventBus.subscribe("entity_die", self._on_entity_die)
+        EventBus.subscribe("item_pickup", self._on_item_pickup)
+        EventBus.subscribe("level_up", self._on_level_up)
         self._load_room(self._room_id)
         self._check_android()
+
+    def on_exit(self):
+        EventBus.unsubscribe("entity_die", self._on_entity_die)
+        EventBus.unsubscribe("item_pickup", self._on_item_pickup)
+        EventBus.unsubscribe("level_up", self._on_level_up)
+        self.android.release_wakelock()
+        super().on_exit()
     
     def _check_android(self):
         """检测 Android 环境。"""
@@ -113,20 +127,36 @@ class GameScene(Scene):
         except ImportError:
             self._android_env = False
 
-    def _load_room(self, room_id: str):
+    def _load_room(self, room_id: str, spawn_pos: Vector2 = None):
         room = Room.from_json(f"maps/{room_id}.json")
         if not room:
             return
+        self.room = room
+        self._room_id = room.room_id
         self.tilemap = Tilemap(self.resources, self._config.render.tile_size)
         self.tilemap.load(f"maps/{room_id}.json", "tiles/tileset.png")
         self.camera.set_bounds(self.tilemap.pixel_width, self.tilemap.pixel_height)
+        self.collision = CollisionSystem()
         self.collision.set_terrain(self.tilemap.get_collision_rects())
+        tile_size = self._config.render.tile_size
+        self._room_items = [
+            {"type": item.get("type", ""), "pos": Vector2(item["pos"][0] * tile_size, item["pos"][1] * tile_size), "picked": False}
+            for item in room.items if "pos" in item
+        ]
+        self._room_npcs = [
+            {
+                "id": npc.get("id", ""),
+                "dialogue": npc.get("dialogue", ""),
+                "pos": Vector2(npc["pos"][0] * tile_size, npc["pos"][1] * tile_size),
+            }
+            for npc in room.npcs if "pos" in npc
+        ]
 
         if not self.player:
-            self.player = Player(pos=Vector2(64, 64))
+            self.player = Player(pos=spawn_pos or Vector2(64, 64))
             self.player._last_reported_hp = self.player.current_hp
         else:
-            self.player.pos = Vector2(64, 64)
+            self.player.pos = spawn_pos or Vector2(64, 64)
             self.player._last_reported_hp = self.player.current_hp
 
         self.enemies.clear()
@@ -139,6 +169,7 @@ class GameScene(Scene):
             self.collision.add_entity(e)
 
         self.quest.start_quest("MAIN_CH02_001")
+        EventBus.publish("room_enter", {"room_id": room.room_id})
 
         if room.music:
             self.audio.play_music(f"assets/music/{room.music}")
@@ -184,10 +215,18 @@ class GameScene(Scene):
                 self._save_game()
             elif event.key == pygame.K_F9:
                 self._load_game()
+            elif self._state == GameState.PLAYING and event.key == pygame.K_i:
+                self._set_state(GameState.INVENTORY)
+            elif self._state == GameState.PLAYING and event.key == pygame.K_c:
+                self._set_state(GameState.CULTIVATION)
+            elif self._state == GameState.PLAYING and event.key == pygame.K_q:
+                self._set_state(GameState.QUEST)
+            elif self._state == GameState.PLAYING and event.key == pygame.K_e:
+                self._try_interact()
         
         # Android 返回键处理
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_AC_BACK:  # Android BACK 键
+            if event.key in (getattr(pygame, "K_AC_BACK", KEYCODE_BACK), KEYCODE_BACK):  # Android BACK 键
                 if self._state == GameState.PLAYING:
                     self._set_state(GameState.PAUSED)
                 elif self._state == GameState.PAUSED:
@@ -246,8 +285,12 @@ class GameScene(Scene):
         
         # 背包关闭
         if self._state == GameState.INVENTORY:
-            if self.inventory_ui.selected_item_index is not None:
-                pass  # 可选：使用物品
+            selected_idx = self.inventory_ui.selected_item_index
+            items = getattr(self.inventory, "_items", [])
+            if selected_idx is not None and 0 <= selected_idx < len(items):
+                item_id = items[selected_idx].item_id
+                effect = self.inventory.use_item(item_id)
+                self._apply_item_effect(effect)
             
         # 修炼突破
         if self._state == GameState.CULTIVATION:
@@ -286,6 +329,17 @@ class GameScene(Scene):
             self.touch.reset_just_pressed()
         
         self.input.update(dt)
+        if self.input.consume_action("inventory"):
+            self._set_state(GameState.INVENTORY)
+            return
+        if self.input.consume_action("cultivate"):
+            self._set_state(GameState.CULTIVATION)
+            return
+        if self.input.consume_action("map"):
+            self._set_state(GameState.QUEST)
+            return
+        if self.input.consume_action("interact"):
+            self._try_interact()
         self.player.handle_input(self.input, dt)
         self.player.update(dt)
         self.collision.resolve_terrain(self.player)
@@ -322,6 +376,7 @@ class GameScene(Scene):
         if self.player.current_hp < self.player._last_reported_hp:
             self.android.vibrate(150)
         self.player._last_reported_hp = self.player.current_hp
+        self._apply_quest_rewards()
         
         EventBus.publish("update", {"dt": dt})
 
@@ -340,6 +395,18 @@ class GameScene(Scene):
 
         if self.player:
             self.player.render(screen, self.camera)
+
+        for item in self._room_items:
+            if item["picked"]:
+                continue
+            ix = int(item["pos"].x - self.camera.pos.x + 12)
+            iy = int(item["pos"].y - self.camera.pos.y + 12)
+            pygame.draw.circle(screen, (80, 220, 120), (ix, iy), 6)
+
+        for npc in self._room_npcs:
+            nx = int(npc["pos"].x - self.camera.pos.x)
+            ny = int(npc["pos"].y - self.camera.pos.y)
+            pygame.draw.rect(screen, (220, 190, 80), (nx, ny, 24, 28))
 
         self.particles.render(screen, self.camera)
 
@@ -381,16 +448,137 @@ class GameScene(Scene):
             current_hp=self.player.current_hp,
             current_room=self._room_id,
             player_pos=[self.player.pos.x, self.player.pos.y],
+            inventory=[{"item_id": i.item_id, "quantity": i.quantity} for i in getattr(self.inventory, "_items", [])],
+            equipment={slot: eq.item_id for slot, eq in getattr(self.inventory, "_equipment_slots", {}).items() if eq},
             lingshi=self.inventory.lingshi,
+            completed_quests=list(self.quest.completed_quests),
             play_time=self.play_time,
         )
         data.save(slot)
+        EventBus.publish("game_save", {"slot": slot})
 
     def _load_game(self, slot: int = 1):
         data = SaveData.load(slot)
         if data:
-            self.player.current_hp = data.current_hp
+            if data.current_room and data.current_room != self._room_id:
+                self._load_room(
+                    data.current_room,
+                    spawn_pos=Vector2(data.player_pos[0], data.player_pos[1]),
+                )
+            else:
+                self.player.pos = Vector2(data.player_pos[0], data.player_pos[1])
+
+            self.player.current_hp = max(0, min(data.current_hp, data.max_hp))
             self.player.max_hp = data.max_hp
+
+            target_realm = data.realm
             self.cultivation.current_realm_index = 0
+            for idx, realm_data in enumerate(getattr(self.cultivation, "_realms", [])):
+                if realm_data.get("name") == target_realm:
+                    self.cultivation.current_realm_index = idx
+                    break
             self.cultivation.realm_level = data.realm_level
             self.cultivation.lingli = data.lingli
+            self.inventory.lingshi = data.lingshi
+            self.play_time = data.play_time
+
+            getattr(self.inventory, "_items", []).clear()
+            for item in data.inventory:
+                self.inventory.add_item(item.get("item_id", ""), int(item.get("quantity", 1)))
+
+            for slot_name in list(getattr(self.inventory, "_equipment_slots", {}).keys()):
+                self.inventory._equipment_slots[slot_name] = None
+            for _, equip_id in data.equipment.items():
+                self.inventory.equip(equip_id)
+
+            self.quest.completed_quests = list(data.completed_quests)
+            self._awarded_quests = set(self.quest.completed_quests)
+            EventBus.publish("game_load", {"slot": slot})
+
+    def _apply_item_effect(self, effect: dict | None) -> None:
+        if not effect:
+            return
+        if "hp_restore_pct" in effect:
+            self.player.heal(self.player.max_hp * float(effect["hp_restore_pct"]))
+        if "hp_restore" in effect:
+            self.player.heal(float(effect["hp_restore"]))
+        if "mp_restore_pct" in effect:
+            required = self._current_realm_required_lingli()
+            self.cultivation.lingli = min(required, self.cultivation.lingli + required * float(effect["mp_restore_pct"]))
+        if "mp_restore" in effect:
+            required = self._current_realm_required_lingli()
+            self.cultivation.lingli = min(required, self.cultivation.lingli + float(effect["mp_restore"]))
+
+    def _current_realm_required_lingli(self) -> float:
+        if not getattr(self.cultivation, "_realms", []):
+            return 100.0
+        exp_list = self.cultivation.current_realm_data.get("exp_to_next", [])
+        if not exp_list or self.cultivation.realm_level > len(exp_list):
+            return 100.0
+        return float(exp_list[self.cultivation.realm_level - 1])
+
+    def _try_interact(self):
+        if not self.player or not self.room:
+            return
+        tile_size = self._config.render.tile_size
+        interaction_dist = tile_size * 1.5
+        player_center = self.player.pos + self.player.size * 0.5
+
+        for portal in self.room.portals:
+            portal_center = Vector2(portal.pos.x * tile_size + tile_size * 0.5, portal.pos.y * tile_size + tile_size * 0.5)
+            if player_center.distance_to(portal_center) <= interaction_dist:
+                if Room.from_json(f"maps/{portal.target_room}.json"):
+                    EventBus.publish("room_exit", {"room_id": self._room_id, "target_room": portal.target_room})
+                    self._load_room(
+                        portal.target_room,
+                        spawn_pos=Vector2(portal.target_pos.x * tile_size, portal.target_pos.y * tile_size),
+                    )
+                return
+
+        for item in self._room_items:
+            if item["picked"]:
+                continue
+            item_center = item["pos"] + Vector2(tile_size * 0.5, tile_size * 0.5)
+            if player_center.distance_to(item_center) <= interaction_dist:
+                if self.inventory.add_item(item["type"], 1):
+                    item["picked"] = True
+                return
+
+        for npc in self._room_npcs:
+            npc_center = npc["pos"] + Vector2(tile_size * 0.5, tile_size * 0.5)
+            if player_center.distance_to(npc_center) <= interaction_dist:
+                dialogue_id = npc.get("dialogue")
+                if dialogue_id and self.dialogue.start(dialogue_id):
+                    EventBus.publish("dialogue_start", {"dialogue_id": dialogue_id, "npc_id": npc["id"]})
+                    self._set_state(GameState.DIALOGUE)
+                return
+
+    def _on_entity_die(self, data: dict):
+        entity = data.get("entity")
+        if not entity:
+            return
+        entity_id = getattr(entity, "entity_id", "")
+        target_id = entity_id.rsplit("_", 1)[0] if "_" in entity_id else entity_id
+        self.quest.update_from_event("entity_die", target_id)
+        self._apply_quest_rewards()
+
+    def _on_item_pickup(self, data: dict):
+        target_id = data.get("item_id", "")
+        if target_id:
+            self.quest.update_from_event("item_pickup", target_id)
+            self._apply_quest_rewards()
+
+    def _on_level_up(self, data: dict):
+        target_id = data.get("realm", "")
+        if target_id:
+            self.quest.update_from_event("level_up", target_id)
+            self._apply_quest_rewards()
+
+    def _apply_quest_rewards(self):
+        for quest in self.quest.active_quests:
+            if not quest.completed or quest.quest_id in self._awarded_quests:
+                continue
+            self.inventory.lingshi += quest.reward_lingshi
+            for item_id in quest.reward_items:
+                self.inventory.add_item(item_id, 1)
+            self._awarded_quests.add(quest.quest_id)
