@@ -1,14 +1,17 @@
+# Build outputs
+bin/
+.buildozer/
+*.apk
+*.zip
+
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
 *.pyo
 *.egg-info/
+.eggs/
 dist/
-build/
 .deps/
-
-# Logs
 logs/
 
 # IDE
@@ -21,8 +24,9 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Save files
-saves/
+# Test coverage
+.coverage
+htmlcov/
 
-# Test assets
-tests/test_assets/
+# APK builds (redundant)
+xianxia_rpg_apk.zip

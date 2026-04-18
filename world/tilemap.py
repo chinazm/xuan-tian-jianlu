@@ -15,6 +15,7 @@ class Tilemap:
         self._height = 0
         self._tileset: pygame.Surface | None = None
         self._collision_tiles: set[int] = set()
+        self._tileset_width = 0
 
     def load(self, map_path: str, tileset_path: str, collision_tile_ids: list[int] = None) -> None:
         path = Path(map_path)
@@ -28,6 +29,7 @@ class Tilemap:
 
         if tileset_path:
             self._tileset = self._resource_mgr.load(tileset_path)
+            self._tileset_width = self._tileset.get_width() // self._tile_size
 
     @property
     def width(self) -> int:
@@ -63,36 +65,40 @@ class Tilemap:
         end_col = min(self._width, view_x2 // self._tile_size + 2)
         end_row = min(self._height, view_y2 // self._tile_size + 2)
 
-        tile_cols = self._tileset.get_width() // self._tile_size
+        tile_cols = self._tileset_width
+
+        # 计算相机偏移
+        cam_x = int(camera.pos.x)
+        cam_y = int(camera.pos.y)
 
         for row in range(start_row, end_row):
+            # 预计算 Y
+            screen_y = row * self._tile_size - cam_y
+            
+            # 获取行数据
+            row_data = self._tiles[row]
+            
             for col in range(start_col, end_col):
-                tile_id = self._tiles[row][col]
+                tile_id = row_data[col]
                 if tile_id == 0:
                     continue
 
-                src_col = (tile_id - 1) % tile_cols
-                src_row = (tile_id - 1) // tile_cols
-                src_rect = pygame.Rect(
-                    src_col * self._tile_size,
-                    src_row * self._tile_size,
-                    self._tile_size,
-                    self._tile_size,
-                )
+                # 计算 Source Rect
+                tile_id -= 1  # 0-indexed
+                src_x = (tile_id % tile_cols) * self._tile_size
+                src_y = (tile_id // tile_cols) * self._tile_size
+                src_rect = (src_x, src_y, self._tile_size, self._tile_size)
 
-                screen_x = col * self._tile_size - camera.pos.x
-                screen_y = row * self._tile_size - camera.pos.y
-                screen.blit(self._tileset, (int(screen_x), int(screen_y)), src_rect)
+                # 计算 Dest Pos
+                screen_x = col * self._tile_size - cam_x
+                
+                screen.blit(self._tileset, (screen_x, screen_y), src_rect)
 
     def get_collision_rects(self) -> list[pygame.Rect]:
         rects = []
+        ts = self._tile_size
         for row in range(self._height):
             for col in range(self._width):
                 if self.is_collision_tile(self._tiles[row][col]):
-                    rects.append(pygame.Rect(
-                        col * self._tile_size,
-                        row * self._tile_size,
-                        self._tile_size,
-                        self._tile_size,
-                    ))
+                    rects.append(pygame.Rect(col * ts, row * ts, ts, ts))
         return rects

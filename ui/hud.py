@@ -1,57 +1,123 @@
-"""游戏内 HUD：气血条、灵力条、境界、灵石、快捷栏。"""
+"""游戏内 HUD：气血条、灵力条、境界、灵石、快捷栏。支持动态缩放。"""
 import pygame
-from core.config import WindowConfig
+from ui.base_ui import FontManager, ProgressBar, TouchButton
 
 
 class HUD:
     def __init__(self, width: int = 800, height: int = 600):
         self.width = width
         self.height = height
-        self.font = pygame.font.SysFont("sans-serif", 16)
-        self.font_bold = pygame.font.SysFont("sans-serif", 18, bold=True)
-        self.font_small = pygame.font.SysFont("sans-serif", 12)
-        self.bar_height = 12
-        self.bar_width = 160
-
+        self._scale = min(width / 800, height / 600)
+        
+        self.fm = FontManager.get_instance()
+        self.fm.set_scale(self._scale)
+        
+        self._init_layout()
+    
+    def _init_layout(self):
+        """根据屏幕尺寸计算布局。"""
+        s = self._scale
+        bar_width = int(160 * s)
+        bar_height = int(14 * s)
+        
+        # 顶部状态条背景高度
+        self._bg_height = int(44 * s)
+        
+        # 气血条
+        self._hp_bar = ProgressBar(
+            int(10 * s), int(8 * s), bar_width, bar_height,
+            fill_color=(200, 50, 50)
+        )
+        # 灵力条
+        self._mp_bar = ProgressBar(
+            int(10 * s), int(26 * s), bar_width, bar_height,
+            fill_color=(50, 100, 200)
+        )
+        
+        # 境界文字位置
+        self._realm_pos = (self.width // 2, int(10 * s))
+        
+        # 灵石文字位置
+        self._lingshi_pos = (self.width - int(10 * s), int(10 * s))
+        
+        # 快捷技能栏按钮（右下角）
+        btn_size = int(40 * s)
+        spacing = int(6 * s)
+        skill_keys = ["J 攻", "K 技", "L 闪", "E 交"]
+        self._skill_buttons: list[TouchButton] = []
+        
+        for i, label in enumerate(skill_keys):
+            x = self.width - (4 * (btn_size + spacing)) + i * (btn_size + spacing)
+            y = self.height - btn_size - int(8 * s)
+            btn = TouchButton(x, y, btn_size, btn_size, label,
+                            font_size=max(10, int(11 * s)),
+                            bg_color=(30, 30, 50),
+                            border_color=(80, 80, 120),
+                            action=f"skill_{i}")
+            self._skill_buttons.append(btn)
+        
+        # 菜单按钮（右上角）
+        menu_btn_size = int(32 * s)
+        self._menu_button = TouchButton(
+            self.width - menu_btn_size - int(10 * s),
+            int(6 * s),
+            menu_btn_size, menu_btn_size,
+            "☰", font_size=max(12, int(16 * s)),
+            bg_color=(40, 40, 60),
+            border_color=(80, 80, 120),
+            action="menu"
+        )
+    
+    def handle_touch(self, touch_pos: tuple, event_type: int) -> bool:
+        """处理 HUD 区域的触摸事件。"""
+        consumed = False
+        
+        # 菜单按钮
+        if self._menu_button.handle_touch(touch_pos, event_type):
+            consumed = True
+        
+        # 技能按钮
+        for btn in self._skill_buttons:
+            if btn.handle_touch(touch_pos, event_type):
+                consumed = True
+        
+        return consumed
+    
     def render(self, screen: pygame.Surface, player_state: dict) -> None:
         # 背景半透明条
-        bg = pygame.Surface((self.width, 40), pygame.SRCALPHA)
-        bg.fill((0, 0, 0, 150))
+        bg = pygame.Surface((self.width, self._bg_height), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 160))
         screen.blit(bg, (0, 0))
-
-        x, y = 10, 8
+        
         # 气血条
-        self._draw_bar(screen, x, y, player_state.get("current_hp", 100),
-                       player_state.get("max_hp", 100), (200, 50, 50), "气血")
+        self._hp_bar.set_value(player_state.get("current_hp", 100),
+                               player_state.get("max_hp", 100))
+        self._hp_bar.render(screen)
+        
         # 灵力条
-        self._draw_bar(screen, x, y + 20, player_state.get("current_mp", 0),
-                       player_state.get("max_mp", 100), (50, 50, 200), "灵力")
-
+        self._mp_bar.set_value(player_state.get("current_mp", 0),
+                               player_state.get("max_mp", 100))
+        self._mp_bar.render(screen)
+        
         # 境界
         realm_text = f"{player_state.get('realm', '炼气期')} 第{player_state.get('realm_level', 1)}层"
-        realm_surf = self.font_bold.render(realm_text, True, (255, 215, 0))
-        screen.blit(realm_surf, (self.width // 2 - realm_surf.get_width() // 2, 8))
-
+        realm_surf = self.fm.render_text(realm_text, 16, (255, 215, 0), bold=True)
+        screen.blit(realm_surf, (self._realm_pos[0] - realm_surf.get_width() // 2, self._realm_pos[1]))
+        
         # 灵石
         lingshi_text = f"灵石: {player_state.get('lingshi', 0)}"
-        ls_surf = self.font.render(lingshi_text, True, (200, 200, 200))
-        screen.blit(ls_surf, (self.width - ls_surf.get_width() - 10, 8))
-
+        ls_surf = self.fm.render_text(lingshi_text, 12, (200, 200, 200))
+        screen.blit(ls_surf, (self._lingshi_pos[0] - ls_surf.get_width(), self._lingshi_pos[1]))
+        
         # 快捷技能栏
-        skills = player_state.get("skills", ["普通攻击", "御剑术"])
-        for i, skill in enumerate(skills[:4]):
-            key = ["J", "K", "L", "U"][i]
-            box = pygame.Rect(self.width - 200 + i * 48, self.height - 40, 44, 36)
-            pygame.draw.rect(screen, (40, 40, 60), box)
-            pygame.draw.rect(screen, (100, 100, 140), box, 1)
-            txt = self.font_small.render(key, True, (180, 180, 200))
-            screen.blit(txt, (box.x + 2, box.y + 2))
-            name = self.font_small.render(skill[:3], True, (200, 200, 200))
-            screen.blit(name, (box.x + 2, box.y + 18))
-
-    def _draw_bar(self, screen: pygame.Surface, x: int, y: int, current: float, maximum: float, color: tuple, label: str) -> None:
-        ratio = max(0, min(1, current / maximum if maximum > 0 else 0))
-        pygame.draw.rect(screen, (40, 40, 40), (x, y, self.bar_width, self.bar_height))
-        pygame.draw.rect(screen, color, (x, y, int(self.bar_width * ratio), self.bar_height))
-        text = self.font_small.render(f"{label}: {int(current)}/{int(maximum)}", True, (255, 255, 255))
-        screen.blit(text, (x + 4, y - 1))
+        for btn in self._skill_buttons:
+            btn.render(screen)
+        
+        # 菜单按钮
+        self._menu_button.render(screen)
+    
+    def reset(self):
+        """重置按钮状态。"""
+        self._menu_button.reset_state()
+        for btn in self._skill_buttons:
+            btn.reset_state()

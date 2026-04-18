@@ -1,5 +1,6 @@
 """存档系统：JSON 序列化存档、版本校验、多存档位。"""
 import json
+import os
 import hashlib
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
@@ -7,7 +8,19 @@ from typing import Optional
 from core.logger import GameLogger
 
 logger = GameLogger.get("save")
-SAVE_DIR = Path("saves")
+
+def get_save_dir() -> Path:
+    """获取存档目录，兼容桌面和 Android APK 环境。"""
+    try:
+        import android
+        # Android 环境下使用应用私有存储路径
+        from android.storage import get_private_storage_path
+        return Path(get_private_storage_path()) / "saves"
+    except ImportError:
+        # 桌面环境使用相对路径
+        return Path("saves")
+
+SAVE_DIR = get_save_dir()
 SCHEMA_VERSION = 1
 
 
