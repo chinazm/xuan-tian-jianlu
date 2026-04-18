@@ -95,39 +95,41 @@ def main():
     scene.on_enter()
 
     running = True
-    while running:
-        # 计算 dt
-        dt = clock.tick(target_fps) / 1000.0
+    try:
+        while running:
+            # 计算 dt
+            dt = clock.tick(target_fps) / 1000.0
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                
+                # 将鼠标/触摸坐标转换为虚拟画布坐标
+                if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
+                    mx, my = event.pos
+                    vx = int((mx - offset_x) / scale)
+                    vy = int((my - offset_y) / scale)
+                    # 更新事件坐标以便后续逻辑处理 (如果支持鼠标)
+                    if hasattr(event, 'dict'):
+                        event.dict['x'] = vx
+                        event.dict['y'] = vy
+                
+                scene.handle_event(event)
+
+            scene.update(dt)
             
-            # 将鼠标/触摸坐标转换为虚拟画布坐标
-            if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
-                mx, my = event.pos
-                vx = int((mx - offset_x) / scale)
-                vy = int((my - offset_y) / scale)
-                # 更新事件坐标以便后续逻辑处理 (如果支持鼠标)
-                if hasattr(event, 'dict'):
-                    event.dict['x'] = vx
-                    event.dict['y'] = vy
+            # 1. 渲染到虚拟画布
+            scene.render(virtual_canvas)
             
-            scene.handle_event(event)
-
-        scene.update(dt)
-        
-        # 1. 渲染到虚拟画布
-        scene.render(virtual_canvas)
-        
-        # 2. 缩放并绘制到物理屏幕
-        screen.fill((0, 0, 0))  # 黑边填充
-        scaled_surface = pygame.transform.smoothscale(virtual_canvas, (int(VIRTUAL_WIDTH * scale), int(VIRTUAL_HEIGHT * scale)))
-        screen.blit(scaled_surface, (offset_x, offset_y))
-        
-        pygame.display.flip()
-
-    pygame.quit()
+            # 2. 缩放并绘制到物理屏幕
+            screen.fill((0, 0, 0))  # 黑边填充
+            scaled_surface = pygame.transform.smoothscale(virtual_canvas, (int(VIRTUAL_WIDTH * scale), int(VIRTUAL_HEIGHT * scale)))
+            screen.blit(scaled_surface, (offset_x, offset_y))
+            
+            pygame.display.flip()
+    finally:
+        scene.on_exit()
+        pygame.quit()
 
 
 if __name__ == "__main__":

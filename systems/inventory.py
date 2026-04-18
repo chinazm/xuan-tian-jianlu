@@ -100,3 +100,20 @@ class Inventory:
                 def_ += eq.def_bonus
                 hp += eq.hp_bonus
         return {"atk": atk, "def": def_, "hp": hp}
+
+    def get_items(self) -> list[Item]:
+        return list(self._items)
+
+    def clear_items(self) -> None:
+        self._items.clear()
+
+    def clear_equipment(self) -> None:
+        for slot_name in self._equipment_slots:
+            self._equipment_slots[slot_name] = None
+
+    def get_equipment_mapping(self) -> dict[str, str]:
+        return {
+            slot_name: equip.item_id
+            for slot_name, equip in self._equipment_slots.items()
+            if equip
+        }
