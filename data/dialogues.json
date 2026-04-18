@@ -1,0 +1,22 @@
+{
+  "master_greeting": {
+    "lines": [
+      {"speaker": "master", "text": "徒儿，你来了。近来修行可有进展？"},
+      {"speaker": "player", "choices": [
+        {"text": "弟子一切安好", "next": "master_praise"},
+        {"text": "弟子还需努力", "next": "master_encourage"}
+      ]}
+    ]
+  },
+  "master_praise": {
+    "lines": [
+      {"speaker": "master", "text": "好！为师没有看错你。"},
+      {"speaker": "system", "next": null}
+    ]
+  },
+  "master_encourage": {
+    "lines": [
+      {"speaker": "master", "text": "修行之路，贵在坚持。去吧。"}
+    ]
+  }
+}

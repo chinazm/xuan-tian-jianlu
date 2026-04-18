@@ -1,0 +1,16 @@
+{
+  "MAIN_CH01_001": {
+    "title": "灵根测试",
+    "description": "参与灵根测试",
+    "giver_npc": "system",
+    "objectives": [{"type": "talk", "target": "wang_zhishi", "required": 1}],
+    "reward": {"lingshi": 0, "items": []}
+  },
+  "MAIN_CH02_001": {
+    "title": "竹林历练",
+    "description": "在迷雾竹林击杀3只妖兽",
+    "giver_npc": "liu_qingfeng",
+    "objectives": [{"type": "kill", "target": "bamboo_demon", "required": 3}],
+    "reward": {"lingshi": 50, "items": ["hp_potion"]}
+  }
+}

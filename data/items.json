@@ -1,0 +1,13 @@
+{
+  "items": {
+    "hp_potion": {"name": "回气丹", "type": "consumable", "description": "恢复50%气血", "effect": {"hp_restore_pct": 0.5}, "max_stack": 20},
+    "mp_potion": {"name": "培元丹", "type": "consumable", "description": "恢复30%灵力", "effect": {"mp_restore_pct": 0.3}, "max_stack": 20},
+    "lingcao": {"name": "灵草", "type": "material", "description": "炼丹材料", "max_stack": 99},
+    "spirit_stone_low": {"name": "下品灵石", "type": "currency", "max_stack": 9999}
+  },
+  "equipment": {
+    "bamboo_sword": {"name": "青竹剑", "slot": "weapon", "atk": 5, "description": "入门飞剑"},
+    "iron_armor": {"name": "铁甲", "slot": "armor", "def": 3, "hp": 20, "description": "普通护甲"},
+    "focus_bead": {"name": "凝神珠", "slot": "accessory", "atk": 2, "def": 1, "description": "提升灵力凝聚"}
+  }
+}
