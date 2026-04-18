@@ -26,30 +26,42 @@ def load_settings() -> dict:
 def main():
     settings = load_settings()
     win_cfg = settings.get("window", {})
-
     width = win_cfg.get("width", 800)
     height = win_cfg.get("height", 600)
     title = win_cfg.get("title", "玄天剑录")
     fps = win_cfg.get("fps", 60)
-    bg_color = tuple(win_cfg.get("background_color", [20, 20, 30]))
 
     pygame.init()
+    pygame.mixer.init()
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption(title)
     clock = pygame.time.Clock()
 
+    # 初始化游戏场景
+    from core.config import GameConfig
+    from core.game import GameScene
+
+    config = GameConfig()
+    config.window.width = width
+    config.window.height = height
+    config.window.fps = fps
+    config.window.title = title
+
+    scene = GameScene(config, room_id="sect_main")
+    scene.on_enter()
+
     running = True
     while running:
+        dt = clock.tick(fps) / 1000.0
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
+            scene.handle_event(event)
 
-        screen.fill(bg_color)
+        scene.update(dt)
+        scene.render(screen)
         pygame.display.flip()
-        clock.tick(fps)
 
     pygame.quit()
 
