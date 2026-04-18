@@ -1,0 +1,8 @@
+12:07:48 [INFO] scene: Entering scene: scene1
+12:07:48 [INFO] scene: Exiting scene: scene1
+12:07:48 [INFO] scene: Entering scene: scene2
+12:07:48 [INFO] scene: Entering scene: scene1
+12:07:48 [INFO] scene: Exiting scene: scene1
+12:07:48 [INFO] scene: Entering scene: scene2
+12:07:48 [ERROR] scene: Scene not found: nonexistent
+12:07:48 [INFO] scene: Entering scene: scene1
