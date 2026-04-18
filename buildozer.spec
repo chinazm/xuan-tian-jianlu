@@ -20,7 +20,7 @@ version = 0.1
 
 # (list) Application requirements
 # Pygame is supported in recent python-for-android versions
-requirements = python3,pygame
+requirements = python3,pygame,android,pyjnius
 
 # (str) Custom source folders for requirements
 # requirements.source.pygame = ../../pygame
