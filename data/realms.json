@@ -1,0 +1,23 @@
+[
+  {
+    "name": "炼气期",
+    "exp_to_next": [50, 80, 120, 170, 230, 300, 380, 470, 570, 680, 800, 930, 1070],
+    "base_hp": 100, "base_atk": 10, "base_def": 2,
+    "breakthrough_chance": 0.9,
+    "description": "引气入体，初窥门径"
+  },
+  {
+    "name": "筑基期",
+    "exp_to_next": [1500, 2000, 2600, 3300, 4100, 5000, 6000, 7100, 8300],
+    "base_hp": 300, "base_atk": 30, "base_def": 8,
+    "breakthrough_chance": 0.7,
+    "description": "气凝为液，道基初成"
+  },
+  {
+    "name": "金丹期",
+    "exp_to_next": [10000, 13000, 16000, 20000, 24000, 28000, 33000, 38000, 44000],
+    "base_hp": 800, "base_atk": 80, "base_def": 20,
+    "breakthrough_chance": 0.5,
+    "description": "液凝为丹，寿元五百"
+  }
+]
