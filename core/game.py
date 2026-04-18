@@ -96,6 +96,8 @@ class GameScene(Scene):
         self._room_items: list[dict] = []
         self._room_npcs: list[dict] = []
         self._awarded_quests: set[str] = set()
+        self._enemy_sprites: dict[str, list] = {}
+        self._npc_sprites: dict[str, list] = {}
         self.paused = False
         self.play_time = 0.0
 
@@ -147,6 +149,11 @@ class GameScene(Scene):
             }
             for npc in room.npcs if "pos" in npc
         ]
+        self._npc_sprites = {}
+        for npc in self._room_npcs:
+            npc_id = npc["id"]
+            if npc_id and npc_id not in self._npc_sprites:
+                self._npc_sprites[npc_id] = self.resources.load_npc_sprite(npc_id)
 
         if not self.player:
             self.player = Player(pos=spawn_pos or Vector2(64, 64))
@@ -376,6 +383,36 @@ class GameScene(Scene):
         
         EventBus.publish("update", {"dt": dt})
 
+
+    def _render_enemy_sprite(self, screen, enemy):
+        """Render enemy with animated sprite sheet."""
+        x = int(enemy.pos.x - self.camera.pos.x)
+        y = int(enemy.pos.y - self.camera.pos.y)
+        
+        sprite_sheet = self._enemy_sprites.get(enemy.enemy_type)
+        if not sprite_sheet:
+            pygame.draw.rect(screen, (200, 50, 50), (x, y, 32, 32))
+            return
+        
+        frame = enemy.get_sprite_frame()
+        if frame < len(sprite_sheet):
+            screen.blit(sprite_sheet[frame], (x, y))
+
+    def _render_npc_sprite(self, screen, npc):
+        """Render NPC with 4-direction sprite sheet (facing down, idle)."""
+        x = int(npc["pos"].x - self.camera.pos.x)
+        y = int(npc["pos"].y - self.camera.pos.y)
+        
+        sprite_sheet = self._npc_sprites.get(npc["id"])
+        if not sprite_sheet:
+            pygame.draw.rect(screen, (220, 190, 80), (x, y, 24, 28))
+            return
+        
+        # Direction 0 = down, frame 0 = idle
+        idx = 0  # Row 0 (down facing), col 0 (idle frame)
+        if idx < len(sprite_sheet):
+            screen.blit(sprite_sheet[idx], (x, y))
+
     def render(self, screen):
         screen.fill((20, 20, 30))
         if self.tilemap:
@@ -383,7 +420,7 @@ class GameScene(Scene):
 
         for enemy in self.enemies:
             if enemy.is_alive:
-                enemy.render(screen, self.camera)
+                self._render_enemy_sprite(screen, enemy)
 
         for proj in self.combat.get_projectiles():
             if proj.is_alive:
@@ -400,9 +437,7 @@ class GameScene(Scene):
             pygame.draw.circle(screen, (80, 220, 120), (ix, iy), 6)
 
         for npc in self._room_npcs:
-            nx = int(npc["pos"].x - self.camera.pos.x)
-            ny = int(npc["pos"].y - self.camera.pos.y)
-            pygame.draw.rect(screen, (220, 190, 80), (nx, ny, 24, 28))
+            self._render_npc_sprite(screen, npc)
 
         self.particles.render(screen, self.camera)
 

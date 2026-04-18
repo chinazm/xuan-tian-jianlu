@@ -69,3 +69,8 @@ class Enemy(Entity):
             ))
             return
         super().render(screen, camera)
+
+    def get_sprite_frame(self) -> int:
+        """Get current animation frame (0-2)."""
+        import time
+        return int(time.time() * 4) % 3

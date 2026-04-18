@@ -69,6 +69,31 @@ class ResourceManager:
             except FileNotFoundError:
                 pass
 
+
+    def load_enemy_sprite(self, enemy_type: str) -> list:
+        """Load 3-frame enemy animation sprite sheet."""
+        path = f"sprites/enemy_{enemy_type}.png"
+        try:
+            return self.load_spritesheet(path, 32, 32)
+        except FileNotFoundError:
+            return None
+
+    def load_npc_sprite(self, npc_id: str) -> list:
+        """Load 4-direction × 4-frame NPC sprite sheet (128×128)."""
+        path = f"sprites/npc_{npc_id}.png"
+        try:
+            return self.load_spritesheet(path, 32, 32)
+        except FileNotFoundError:
+            return None
+
+    def load_item_sprite(self, item_id: str):
+        """Load single item sprite."""
+        path = f"items/{item_id}.png"
+        try:
+            return self.load(path)
+        except FileNotFoundError:
+            return None
+
     def cache_info(self) -> dict:
         return {
             "cached": len(self._cache),
