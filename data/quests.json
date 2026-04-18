@@ -1,16 +1,445 @@
 {
   "MAIN_CH01_001": {
     "title": "灵根测试",
-    "description": "参与灵根测试",
-    "giver_npc": "system",
-    "objectives": [{"type": "talk", "target": "wang_zhishi", "required": 1}],
-    "reward": {"lingshi": 0, "items": []}
+    "description": "参与青石镇的灵根测试",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "wang_zhishi",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 0,
+      "items": []
+    }
+  },
+  "MAIN_CH01_002": {
+    "title": "拜入青云",
+    "description": "完成入门仪式，拜清虚真人为师",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "qingxu",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 10,
+      "items": [
+        "qingyun_manual",
+        "hp_potion"
+      ]
+    }
+  },
+  "MAIN_CH01_003": {
+    "title": "初修青云诀",
+    "description": "修炼至炼气期一层",
+    "objectives": [
+      {
+        "type": "level_up",
+        "target": "炼气期一层",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 5,
+      "items": [
+        "hp_potion",
+        "mp_potion"
+      ]
+    }
+  },
+  "SIDE_CH01_001": {
+    "title": "坊市初探",
+    "description": "帮助莫长老整理货物",
+    "objectives": [
+      {
+        "type": "interact",
+        "target": "mo_laozhang",
+        "required": 10
+      }
+    ],
+    "reward": {
+      "lingshi": 20,
+      "items": [
+        "mp_potion",
+        "market_token"
+      ]
+    }
+  },
+  "SIDE_CH01_002": {
+    "title": "药园之缘",
+    "description": "帮苏灵儿照看灵草",
+    "objectives": [
+      {
+        "type": "interact",
+        "target": "su_linger",
+        "required": 3
+      },
+      {
+        "type": "kill",
+        "target": "spirit_rat",
+        "required": 5
+      }
+    ],
+    "reward": {
+      "lingshi": 15,
+      "items": [
+        "hp_potion",
+        "mp_potion"
+      ]
+    }
   },
   "MAIN_CH02_001": {
-    "title": "竹林历练",
-    "description": "在迷雾竹林击杀3只妖兽",
-    "giver_npc": "liu_qingfeng",
-    "objectives": [{"type": "kill", "target": "bamboo_demon", "required": 3}],
-    "reward": {"lingshi": 50, "items": ["hp_potion"]}
+    "title": "迷雾竹林试炼",
+    "description": "击杀雾隐蛇×3并获取妖丹",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "foggy_snake",
+        "required": 3
+      }
+    ],
+    "reward": {
+      "lingshi": 50,
+      "items": [
+        "hp_potion",
+        "spirit_stone_low"
+      ]
+    }
+  },
+  "MAIN_CH02_002": {
+    "title": "竹林深处",
+    "description": "深入迷雾竹林，击败幻影狐",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "phantom_fox",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 80,
+      "items": [
+        "fox_spirit",
+        "mp_potion"
+      ]
+    }
+  },
+  "SIDE_CH02_001": {
+    "title": "赵虎的麻烦",
+    "description": "在竹林中救助被妖兽围攻的赵虎",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "zhao_hu",
+        "required": 1
+      },
+      {
+        "type": "kill",
+        "target": "bamboo_rat",
+        "required": 2
+      }
+    ],
+    "reward": {
+      "lingshi": 30,
+      "items": [
+        "hp_potion"
+      ]
+    }
+  },
+  "SIDE_CH02_002": {
+    "title": "灵草收集",
+    "description": "收集迷雾竹林中的灵竹心×5",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "bamboo_heart",
+        "required": 5
+      }
+    ],
+    "reward": {
+      "lingshi": 25,
+      "items": [
+        "mp_potion"
+      ]
+    }
+  },
+  "MAIN_CH03_001": {
+    "title": "内门考核",
+    "description": "通过内门弟子考核",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "stone_golem",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 100,
+      "items": [
+        "inner_disciple_robe"
+      ]
+    }
+  },
+  "MAIN_CH03_002": {
+    "title": "古墓探险",
+    "description": "进入南岭古墓寻找上古功法",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "tomb_guardian",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 150,
+      "items": [
+        "ancient_manual",
+        "hp_potion"
+      ]
+    }
+  },
+  "MAIN_CH03_003": {
+    "title": "幽冥将军",
+    "description": "击败古墓深处的幽冥将军",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "ghost_general",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 300,
+      "items": [
+        "ghost_armor",
+        "soul_sword"
+      ]
+    }
+  },
+  "SIDE_CH03_001": {
+    "title": "苏灵儿的请求",
+    "description": "帮苏灵儿收集古墓中的灵药",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "tomb_herb",
+        "required": 3
+      }
+    ],
+    "reward": {
+      "lingshi": 40,
+      "items": [
+        "hp_potion",
+        "mp_potion"
+      ]
+    }
+  },
+  "SIDE_CH03_002": {
+    "title": "骷髅围城",
+    "description": "击退围攻青云宗的骷髅大军",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "skeleton_warrior",
+        "required": 10
+      }
+    ],
+    "reward": {
+      "lingshi": 200,
+      "items": [
+        "spirit_stone_mid"
+      ]
+    }
+  },
+  "MAIN_CH04_001": {
+    "title": "魔渊谷之行",
+    "description": "前往西漠魔渊谷调查魔修活动",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "scout",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 200,
+      "items": [
+        "demon_ward"
+      ]
+    }
+  },
+  "MAIN_CH04_002": {
+    "title": "血魔教徒",
+    "description": "击败血魔教徒，获取情报",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "blood_demon",
+        "required": 5
+      }
+    ],
+    "reward": {
+      "lingshi": 250,
+      "items": [
+        "blood_pearl"
+      ]
+    }
+  },
+  "MAIN_CH04_003": {
+    "title": "暗影刺客",
+    "description": "追踪并击败暗影刺客",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "shadow_assassin",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 350,
+      "items": [
+        "shadow_cloak"
+      ]
+    }
+  },
+  "MAIN_CH04_004": {
+    "title": "堕仙之秘",
+    "description": "调查堕仙的真实身份",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "corrupt_cultivator",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 400,
+      "items": [
+        "corrupt_core"
+      ]
+    }
+  },
+  "SIDE_CH04_001": {
+    "title": "营救同门",
+    "description": "救出被魔修俘虏的青云宗弟子",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "captive_disciple",
+        "required": 3
+      }
+    ],
+    "reward": {
+      "lingshi": 150,
+      "items": [
+        "hp_potion"
+      ]
+    }
+  },
+  "SIDE_CH04_002": {
+    "title": "血池封印",
+    "description": "封印魔渊谷中的血池",
+    "objectives": [
+      {
+        "type": "interact",
+        "target": "blood_pool",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 300,
+      "items": [
+        "seal_talisman"
+      ]
+    }
+  },
+  "MAIN_CH05_001": {
+    "title": "北原之行",
+    "description": "前往北原凌霄峰寻找突破机缘",
+    "objectives": [
+      {
+        "type": "talk",
+        "target": "north_guide",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 300,
+      "items": [
+        "warmth_charm"
+      ]
+    }
+  },
+  "MAIN_CH05_002": {
+    "title": "冰龙觉醒",
+    "description": "唤醒沉睡的冰龙",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "frost_dragon",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 500,
+      "items": [
+        "dragon_scale",
+        "dragon_blood"
+      ]
+    }
+  },
+  "MAIN_CH05_003": {
+    "title": "渡劫飞升",
+    "description": "在北原天劫台渡劫飞升",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "thunder_eagle",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 1000,
+      "items": [
+        "heaven_essence"
+      ]
+    }
+  },
+  "SIDE_CH05_001": {
+    "title": "雪狼围猎",
+    "description": "在北原雪原猎杀冰原雪狼",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "frost_wolf",
+        "required": 5
+      }
+    ],
+    "reward": {
+      "lingshi": 100,
+      "items": [
+        "frost_fur"
+      ]
+    }
+  },
+  "SIDE_CH05_002": {
+    "title": "冰雪巨人之战",
+    "description": "击败冰谷中的冰雪巨人",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "ice_golem",
+        "required": 1
+      }
+    ],
+    "reward": {
+      "lingshi": 400,
+      "items": [
+        "ice_core"
+      ]
+    }
   }
 }

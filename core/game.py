@@ -164,7 +164,7 @@ class GameScene(Scene):
         for e in [self.player] + self.enemies:
             self.collision.add_entity(e)
 
-        self.quest.start_quest("MAIN_CH02_001")
+        self.quest.start_quest("MAIN_CH01_001")
         EventBus.publish("room_enter", {"room_id": room.room_id})
 
         if room.music:
@@ -533,6 +533,7 @@ class GameScene(Scene):
             if player_center.distance_to(item_center) <= interaction_dist:
                 if self.inventory.add_item(item["type"], 1):
                     item["picked"] = True
+                    EventBus.publish("item_pickup", {"item_id": item["type"]})
                 return
 
         for npc in self._room_npcs:

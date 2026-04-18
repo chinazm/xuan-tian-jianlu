@@ -91,7 +91,7 @@ def main():
     config.window.fps = target_fps
     config.window.title = title
 
-    scene = GameScene(config, room_id="sect_main", base_dir=BASE_DIR)
+    scene = GameScene(config, room_id="ch01_qingshi_town", base_dir=BASE_DIR)
     scene.on_enter()
 
     running = True

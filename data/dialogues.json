@@ -1,22 +1,240 @@
 {
-  "master_greeting": {
+  "spirit_testing_start": {
     "lines": [
-      {"speaker": "master", "text": "徒儿，你来了。近来修行可有进展？"},
-      {"speaker": "player", "choices": [
-        {"text": "弟子一切安好", "next": "master_praise"},
-        {"text": "弟子还需努力", "next": "master_encourage"}
-      ]}
+      {
+        "speaker": "wang_zhishi",
+        "text": "下一个！"
+      },
+      {
+        "speaker": "narrator",
+        "text": "你走上前，将手按在灵根镜上。镜面突然爆发出七色光芒！"
+      },
+      {
+        "speaker": "wang_zhishi",
+        "text": "这……这是……混沌灵根？！万年一遇的混沌灵根？！"
+      },
+      {
+        "speaker": "player",
+        "choices": [
+          {
+            "text": "晚辈愚钝，请执事大人赐教。",
+            "next": "spirit_testing_explain"
+          },
+          {
+            "text": "混沌灵根是什么？",
+            "next": "spirit_testing_explain"
+          }
+        ]
+      }
     ]
   },
-  "master_praise": {
+  "spirit_testing_explain": {
     "lines": [
-      {"speaker": "master", "text": "好！为师没有看错你。"},
-      {"speaker": "system", "next": null}
+      {
+        "speaker": "wang_zhishi",
+        "text": "混沌灵根乃天地初开时的本源灵根，五行俱全且超乎五行之外。万法可修！"
+      },
+      {
+        "speaker": "wang_zhishi",
+        "text": "你叫什么名字？可有什么牵挂之人？"
+      },
+      {
+        "speaker": "player",
+        "text": "晚辈林凡，由镇上铁匠陈伯抚养长大。"
+      },
+      {
+        "speaker": "old_blacksmith",
+        "text": "凡儿……你这一去，不知何时才能回来。陈伯只盼你在仙门之中，平安顺遂。"
+      },
+      {
+        "speaker": "player",
+        "text": "陈伯，您养育之恩，林凡没齿难忘。"
+      }
     ]
   },
-  "master_encourage": {
+  "qingxu_greeting": {
     "lines": [
-      {"speaker": "master", "text": "修行之路，贵在坚持。去吧。"}
+      {
+        "speaker": "qingxu",
+        "text": "林凡，你乃万年一遇的混沌灵根，老夫收你为关门弟子。"
+      },
+      {
+        "speaker": "qingxu",
+        "text": "这是《青云诀》，青云宗入门功法。回去好生修炼。"
+      },
+      {
+        "speaker": "system",
+        "text": "【获得物品】《青云诀》x1、下品灵石x10"
+      }
+    ]
+  },
+  "liu_guide": {
+    "lines": [
+      {
+        "speaker": "liu_qingfeng",
+        "text": "师弟，恭喜拜入清虚师叔门下。走，我带你去外门住处。"
+      },
+      {
+        "speaker": "narrator",
+        "text": "路旁古松参天，灵泉潺潺。远处药园中，一名青衣少女正在采摘灵草。"
+      }
+    ]
+  },
+  "su_first_meet": {
+    "lines": [
+      {
+        "speaker": "su_linger",
+        "text": "你是新来的师弟吧？我叫苏灵儿，在药园做事。"
+      },
+      {
+        "speaker": "su_linger",
+        "text": "以后常来药园玩，我给你留些好灵草。"
+      },
+      {
+        "speaker": "player",
+        "text": "多谢苏师姐。"
+      }
+    ]
+  },
+  "su_garden_help": {
+    "lines": [
+      {
+        "speaker": "su_linger",
+        "text": "师弟你来得正好！药园里最近总有灵鼠偷吃灵草。"
+      },
+      {
+        "speaker": "su_linger",
+        "text": "你能帮我赶走它们吗？我给你初级养气丹作为感谢。"
+      },
+      {
+        "speaker": "player",
+        "choices": [
+          {
+            "text": "包在我身上！",
+            "next": "quest_garden_start"
+          },
+          {
+            "text": "我还有点忙，稍后再来。",
+            "next": null
+          }
+        ]
+      }
+    ]
+  },
+  "zhao_help": {
+    "lines": [
+      {
+        "speaker": "zhao_hu",
+        "text": "救命！这些竹鼠太多了！"
+      },
+      {
+        "speaker": "narrator",
+        "text": "赵虎被几只铁甲竹鼠围攻，情况危急。"
+      },
+      {
+        "speaker": "player",
+        "text": "赵师兄别怕，我来帮你！"
+      }
+    ]
+  },
+  "sun_warn": {
+    "lines": [
+      {
+        "speaker": "sun_ming",
+        "text": "师弟，迷雾竹林的雾气能迷惑神识，进去之后务必谨慎。"
+      },
+      {
+        "speaker": "sun_ming",
+        "text": "赵虎那个莽夫迟早要吃亏的。"
+      }
+    ]
+  },
+  "mo_market_help": {
+    "lines": [
+      {
+        "speaker": "mo_laozhang",
+        "text": "小友，坊市需要人手帮忙整理货物。"
+      },
+      {
+        "speaker": "mo_laozhang",
+        "text": "帮我整理十件货物，我给你坊市通行令牌和灵石。"
+      }
+    ]
+  },
+  "scout_intel": {
+    "lines": [
+      {
+        "speaker": "scout",
+        "text": "前方就是魔渊谷了，血魔教徒在里面活动频繁。"
+      },
+      {
+        "speaker": "scout",
+        "text": "务必小心，那些魔修下手极狠。"
+      }
+    ]
+  },
+  "north_guide_intro": {
+    "lines": [
+      {
+        "speaker": "north_guide",
+        "text": "北原常年冰雪覆盖，普通人根本站不住。"
+      },
+      {
+        "speaker": "north_guide",
+        "text": "你是来凌霄峰渡劫的？前面就是冰谷，小心冰原雪狼和冰雪巨人。"
+      }
+    ]
+  },
+  "tomb_gatekeeper": {
+    "lines": [
+      {
+        "speaker": "tomb_guardian",
+        "text": "来者何人？此乃上古修士之墓，闲人勿近。"
+      },
+      {
+        "speaker": "player",
+        "text": "晚辈林凡，奉青云宗之命前来探查古墓。"
+      },
+      {
+        "speaker": "tomb_guardian",
+        "text": "既然是青云宗弟子，进去吧。但切记，古墓深处有幽冥将军镇守，不可轻举妄动。"
+      }
+    ]
+  },
+  "quest_garden_start": {
+    "lines": [
+      {
+        "speaker": "su_linger",
+        "text": "太好了！灵鼠在药园东边，你去赶走五只就回来。"
+      },
+      {
+        "speaker": "system",
+        "text": "【任务更新】药园之缘：击杀灵鼠×5"
+      }
+    ]
+  },
+  "captive_rescue": {
+    "lines": [
+      {
+        "speaker": "captive_disciple",
+        "text": "救命！我们是青云宗弟子，被魔修俘虏了……"
+      },
+      {
+        "speaker": "player",
+        "text": "别怕，我来救你们出去！"
+      }
+    ]
+  },
+  "blood_pool_seal": {
+    "lines": [
+      {
+        "speaker": "narrator",
+        "text": "血池中翻涌着浓郁的煞气，这是魔修用来修炼的邪阵。"
+      },
+      {
+        "speaker": "player",
+        "text": "必须封印这个血池！"
+      }
     ]
   }
 }

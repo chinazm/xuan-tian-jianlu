@@ -1,0 +1,498 @@
+{
+  "foggy_snake": {
+    "name": "雾隐蛇",
+    "type": "beast",
+    "region": "中州·迷雾竹林",
+    "level": 3,
+    "hp": 45,
+    "atk": 8,
+    "def": 3,
+    "speed": 120,
+    "behavior": "ambush",
+    "drops": [
+      "snake_fang",
+      "spirit_stone_low"
+    ],
+    "description": "潜伏在竹林雾气中的毒蛇，攻击带有麻痹效果"
+  },
+  "bamboo_rat": {
+    "name": "铁甲竹鼠",
+    "type": "beast",
+    "region": "中州·迷雾竹林",
+    "level": 4,
+    "hp": 80,
+    "atk": 12,
+    "def": 15,
+    "speed": 60,
+    "behavior": "patrol",
+    "drops": [
+      "iron_shell",
+      "spirit_stone_low"
+    ],
+    "description": "外壳坚硬的巨型竹鼠，防御极高但移动缓慢"
+  },
+  "phantom_fox": {
+    "name": "幻影狐",
+    "type": "beast",
+    "region": "中州·迷雾竹林",
+    "level": 5,
+    "hp": 35,
+    "atk": 15,
+    "def": 5,
+    "speed": 180,
+    "behavior": "evasive",
+    "drops": [
+      "fox_spirit",
+      "spirit_stone_mid"
+    ],
+    "description": "能制造幻象的灵狐，速度快，难以命中"
+  },
+  "spirit_rat": {
+    "name": "灵田鼠",
+    "type": "beast",
+    "region": "中州·药园",
+    "level": 2,
+    "hp": 25,
+    "atk": 5,
+    "def": 2,
+    "speed": 100,
+    "behavior": "flee",
+    "drops": [
+      "grain",
+      "spirit_stone_low"
+    ],
+    "description": "偷吃灵草的小妖兽，见到人就跑"
+  },
+  "mountain_tiger": {
+    "name": "青面虎",
+    "type": "beast",
+    "region": "中州·后山",
+    "level": 8,
+    "hp": 150,
+    "atk": 25,
+    "def": 12,
+    "speed": 140,
+    "behavior": "aggressive",
+    "drops": [
+      "tiger_bone",
+      "spirit_stone_mid"
+    ],
+    "description": "后山霸主，炼气期八层的妖兽"
+  },
+  "stone_golem": {
+    "name": "石灵傀儡",
+    "type": "construct",
+    "region": "中州·试炼秘境",
+    "level": 6,
+    "hp": 200,
+    "atk": 18,
+    "def": 30,
+    "speed": 40,
+    "behavior": "guard",
+    "drops": [
+      "spirit_stone_mid",
+      "ancient_rune"
+    ],
+    "description": "上古修士留下的守护傀儡"
+  },
+  "venom_spider": {
+    "name": "毒蛛妖",
+    "type": "beast",
+    "region": "东荒·万妖林",
+    "level": 10,
+    "hp": 120,
+    "atk": 22,
+    "def": 8,
+    "speed": 150,
+    "behavior": "ambush",
+    "drops": [
+      "venom_sac",
+      "spider_silk",
+      "spirit_stone_mid"
+    ],
+    "description": "万妖林底层的剧毒蜘蛛，蛛丝能束缚敌人"
+  },
+  "tree_demon": {
+    "name": "古木妖",
+    "type": "plant",
+    "region": "东荒·万妖林",
+    "level": 12,
+    "hp": 300,
+    "atk": 15,
+    "def": 25,
+    "speed": 20,
+    "behavior": "stationary",
+    "drops": [
+      "spirit_wood",
+      "life_essence",
+      "spirit_stone_high"
+    ],
+    "description": "千年古树化妖，根深蒂固无法移动但攻击范围极大"
+  },
+  "wolf_king": {
+    "name": "银月狼王",
+    "type": "beast",
+    "region": "东荒·万妖林",
+    "level": 15,
+    "hp": 280,
+    "atk": 35,
+    "def": 18,
+    "speed": 200,
+    "behavior": "pack_leader",
+    "drops": [
+      "wolf_fang",
+      "moon_crystal",
+      "spirit_stone_high"
+    ],
+    "description": "万妖林狼群之首，月圆之夜实力倍增"
+  },
+  "vine_snake": {
+    "name": "藤蟒",
+    "type": "beast",
+    "region": "东荒·万妖林",
+    "level": 9,
+    "hp": 180,
+    "atk": 20,
+    "def": 10,
+    "speed": 80,
+    "behavior": "constrict",
+    "drops": [
+      "snake_skin",
+      "vine_essence"
+    ],
+    "description": "体型如藤蔓般的巨蟒，能伪装成树枝"
+  },
+  "mantis_demon": {
+    "name": "螳螂精",
+    "type": "insect",
+    "region": "东荒·万妖林",
+    "level": 14,
+    "hp": 100,
+    "atk": 40,
+    "def": 5,
+    "speed": 220,
+    "behavior": "assassin",
+    "drops": [
+      "mantis_blade",
+      "spirit_stone_high"
+    ],
+    "description": "双臂如刀的螳螂精，一击致命"
+  },
+  "demon_bird": {
+    "name": "妖鹏",
+    "type": "beast",
+    "region": "东荒·天空",
+    "level": 18,
+    "hp": 200,
+    "atk": 30,
+    "def": 12,
+    "speed": 280,
+    "behavior": "aerial",
+    "drops": [
+      "demon_feather",
+      "wind_crystal",
+      "spirit_stone_high"
+    ],
+    "description": "翱翔天际的巨鸟，俯冲攻击极为凶猛"
+  },
+  "skeleton_warrior": {
+    "name": "骷髅战士",
+    "type": "undead",
+    "region": "南岭·古墓",
+    "level": 10,
+    "hp": 80,
+    "atk": 18,
+    "def": 20,
+    "speed": 60,
+    "behavior": "patrol",
+    "drops": [
+      "bone_shield",
+      "spirit_stone_mid"
+    ],
+    "description": "古墓中的不死骷髅，生前是守卫"
+  },
+  "skeleton_mage": {
+    "name": "骨灵法师",
+    "type": "undead",
+    "region": "南岭·古墓",
+    "level": 13,
+    "hp": 60,
+    "atk": 30,
+    "def": 8,
+    "speed": 50,
+    "behavior": "caster",
+    "drops": [
+      "soul_crystal",
+      "ancient_scroll",
+      "spirit_stone_high"
+    ],
+    "description": "能释放幽冥之火的骷髅法师"
+  },
+  "ghost_general": {
+    "name": "幽冥将军",
+    "type": "undead",
+    "region": "南岭·古墓深处",
+    "level": 20,
+    "hp": 400,
+    "atk": 45,
+    "def": 30,
+    "speed": 100,
+    "behavior": "boss",
+    "drops": [
+      "ghost_armor",
+      "soul_sword",
+      "spirit_stone_top"
+    ],
+    "description": "古墓最深处的主将，生前是大能"
+  },
+  "corpse_puppet": {
+    "name": "炼尸傀儡",
+    "type": "undead",
+    "region": "南岭·炼尸洞",
+    "level": 16,
+    "hp": 350,
+    "atk": 28,
+    "def": 35,
+    "speed": 40,
+    "behavior": "guard",
+    "drops": [
+      "corpse_core",
+      "refined_iron"
+    ],
+    "description": "邪修炼制的尸体傀儡，力大无穷"
+  },
+  "tomb_spider": {
+    "name": "墓穴蛛后",
+    "type": "beast",
+    "region": "南岭·古墓",
+    "level": 14,
+    "hp": 200,
+    "atk": 25,
+    "def": 15,
+    "speed": 120,
+    "behavior": "ambush",
+    "drops": [
+      "royal_silk",
+      "venom_crystal",
+      "spirit_stone_high"
+    ],
+    "description": "古墓中蛛群的母后，能产下毒卵"
+  },
+  "jade_guardian": {
+    "name": "玉俑守卫",
+    "type": "construct",
+    "region": "南岭·墓室",
+    "level": 17,
+    "hp": 280,
+    "atk": 22,
+    "def": 40,
+    "speed": 50,
+    "behavior": "guard",
+    "drops": [
+      "jade_piece",
+      "spirit_stone_high"
+    ],
+    "description": "身穿金缕玉衣的守卫，刀枪不入"
+  },
+  "blood_demon": {
+    "name": "血魔教徒",
+    "type": "demon",
+    "region": "西漠·魔渊谷",
+    "level": 15,
+    "hp": 150,
+    "atk": 30,
+    "def": 12,
+    "speed": 100,
+    "behavior": "aggressive",
+    "drops": [
+      "blood_pearl",
+      "demon_essence",
+      "spirit_stone_high"
+    ],
+    "description": "血魔教底层教徒，以血为食"
+  },
+  "shadow_assassin": {
+    "name": "暗影刺客",
+    "type": "demon",
+    "region": "西漠·魔渊谷",
+    "level": 18,
+    "hp": 90,
+    "atk": 45,
+    "def": 6,
+    "speed": 250,
+    "behavior": "assassin",
+    "drops": [
+      "shadow_cloak",
+      "demon_dagger",
+      "spirit_stone_top"
+    ],
+    "description": "潜伏于暗影中的杀手，一击必杀"
+  },
+  "hell_hound": {
+    "name": "地狱猎犬",
+    "type": "demon",
+    "region": "西漠·魔渊谷",
+    "level": 16,
+    "hp": 180,
+    "atk": 32,
+    "def": 15,
+    "speed": 200,
+    "behavior": "pack",
+    "drops": [
+      "hell_fire",
+      "demon_fang",
+      "spirit_stone_high"
+    ],
+    "description": "口吐地狱火的魔犬，成群出没"
+  },
+  "corrupt_cultivator": {
+    "name": "堕仙",
+    "type": "demon",
+    "region": "西漠·魔渊深处",
+    "level": 25,
+    "hp": 500,
+    "atk": 50,
+    "def": 35,
+    "speed": 150,
+    "behavior": "boss",
+    "drops": [
+      "corrupt_core",
+      "demon_manual",
+      "spirit_stone_top"
+    ],
+    "description": "堕入魔道的修士，实力远超同阶"
+  },
+  "blood_spider": {
+    "name": "血蛛",
+    "type": "demon",
+    "region": "西漠·血池",
+    "level": 14,
+    "hp": 130,
+    "atk": 28,
+    "def": 10,
+    "speed": 140,
+    "behavior": "ambush",
+    "drops": [
+      "blood_silk",
+      "venom_pearl"
+    ],
+    "description": "以鲜血为食的妖蛛，蛛丝带腐蚀性"
+  },
+  "soul_eater": {
+    "name": "噬魂魔",
+    "type": "demon",
+    "region": "西漠·魔渊深处",
+    "level": 22,
+    "hp": 300,
+    "atk": 40,
+    "def": 20,
+    "speed": 180,
+    "behavior": "drain",
+    "drops": [
+      "soul_fragment",
+      "demon_essence",
+      "spirit_stone_top"
+    ],
+    "description": "以吞噬他人魂魄为生的魔物"
+  },
+  "frost_wolf": {
+    "name": "冰原雪狼",
+    "type": "beast",
+    "region": "北原·雪原",
+    "level": 20,
+    "hp": 220,
+    "atk": 35,
+    "def": 18,
+    "speed": 180,
+    "behavior": "pack",
+    "drops": [
+      "frost_fur",
+      "ice_crystal",
+      "spirit_stone_high"
+    ],
+    "description": "北原雪原上的狼群，攻击附带冰冻"
+  },
+  "ice_golem": {
+    "name": "冰雪巨人",
+    "type": "construct",
+    "region": "北原·冰谷",
+    "level": 25,
+    "hp": 500,
+    "atk": 40,
+    "def": 50,
+    "speed": 30,
+    "behavior": "guard",
+    "drops": [
+      "ice_core",
+      "ancient_ice",
+      "spirit_stone_top"
+    ],
+    "description": "万年寒冰凝聚而成的巨人"
+  },
+  "snow_leopard": {
+    "name": "玄冰灵豹",
+    "type": "beast",
+    "region": "北原·凌霄峰",
+    "level": 22,
+    "hp": 180,
+    "atk": 42,
+    "def": 15,
+    "speed": 260,
+    "behavior": "solitary",
+    "drops": [
+      "leopard_hide",
+      "spirit_stone_top"
+    ],
+    "description": "凌霄峰上的灵兽，速度极快"
+  },
+  "thunder_eagle": {
+    "name": "雷霆大鹏",
+    "type": "beast",
+    "region": "北原·天劫台",
+    "level": 30,
+    "hp": 400,
+    "atk": 55,
+    "def": 25,
+    "speed": 300,
+    "behavior": "boss",
+    "drops": [
+      "thunder_feather",
+      "heaven_essence",
+      "spirit_stone_top"
+    ],
+    "description": "渡劫台守护神兽，操控雷电"
+  },
+  "avalanche_spirit": {
+    "name": "雪崩精",
+    "type": "elemental",
+    "region": "北原·冰谷",
+    "level": 18,
+    "hp": 250,
+    "atk": 30,
+    "def": 35,
+    "speed": 60,
+    "behavior": "area",
+    "drops": [
+      "snow_core",
+      "spirit_stone_high"
+    ],
+    "description": "雪山灵气凝聚的精怪，能引发雪崩"
+  },
+  "frost_dragon": {
+    "name": "冰龙",
+    "type": "dragon",
+    "region": "北原·龙脉",
+    "level": 35,
+    "hp": 800,
+    "atk": 70,
+    "def": 55,
+    "speed": 200,
+    "behavior": "boss",
+    "drops": [
+      "dragon_scale",
+      "dragon_blood",
+      "spirit_stone_top"
+    ],
+    "description": "北原龙脉中沉睡的远古冰龙"
+  }
+}
