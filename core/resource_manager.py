@@ -8,15 +8,8 @@ from typing import Optional
 
 def get_base_dir() -> Path:
     """获取项目根目录，兼容桌面和 Android APK 环境。"""
-    # Android 环境下，资源被打包到应用私有目录
-    try:
-        import android
-        # p4a 通常把 cwd 设为解压后的资源目录
-        return Path(os.getcwd())
-    except ImportError:
-        pass
-    
-    # 桌面环境：使用调用脚本所在目录
+    # 统一使用 __file__ 定位项目根目录（不依赖 os.getcwd()，
+    # 因为 Android 上 cwd 可能指向错误的目录）
     return Path(os.path.dirname(os.path.abspath(__file__))).parent
 
 

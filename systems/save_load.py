@@ -12,10 +12,10 @@ logger = GameLogger.get("save")
 def get_save_dir() -> Path:
     """获取存档目录，兼容桌面和 Android APK 环境。"""
     try:
-        import android
-        # Android 环境下使用应用私有存储路径
-        from android.storage import get_private_storage_path
-        return Path(get_private_storage_path()) / "saves"
+        import android  # noqa: F401
+        # Android 环境下使用当前工作目录（p4a 设置为应用私有目录）
+        import os
+        return Path(os.getcwd()) / "saves"
     except ImportError:
         # 桌面环境使用相对路径
         return Path("saves")

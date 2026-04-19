@@ -564,7 +564,8 @@ class GameScene(Scene):
         for portal in self.room.portals:
             portal_center = Vector2(portal.pos.x * tile_size + tile_size * 0.5, portal.pos.y * tile_size + tile_size * 0.5)
             if player_center.distance_to(portal_center) <= interaction_dist:
-                if Room.from_json(f"maps/{portal.target_room}.json"):
+                target_path = self._base_dir / "maps" / f"{portal.target_room}.json"
+                if target_path.exists():
                     EventBus.publish("room_exit", {"room_id": self._room_id, "target_room": portal.target_room})
                     self._load_room(
                         portal.target_room,

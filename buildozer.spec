@@ -56,8 +56,8 @@ android.permissions = android.permission.VIBRATE
 # (str) Android NDK version
 #android.ndk = 25b
 
-# (str) Android API level
-android.api = 33
+# (str) Android API level (34 required for Android 14+)
+android.api = 34
 android.minapi = 21
 #android.sdk = 20
 #android.ndk_api = 21

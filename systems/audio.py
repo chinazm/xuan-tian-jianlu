@@ -9,7 +9,16 @@ class AudioManager:
         self._music_volume = music_volume
         self._sfx_volume = sfx_volume
         self._current_music: Optional[str] = None
-        self._music_available = True
+        self._music_available = False
+        # Check if mixer is actually initialized before marking as available
+        try:
+            if pygame.mixer.get_init():
+                self._music_available = True
+            else:
+                print("[AudioManager] pygame.mixer not initialized, audio disabled")
+        except Exception as e:
+            print(f"[AudioManager] mixer check failed: {e}")
+            self._music_available = False
 
     def play_music(self, path: str, loops: int = -1):
         if not self._music_available:
