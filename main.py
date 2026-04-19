@@ -31,9 +31,9 @@ def load_settings() -> dict:
 def is_android() -> bool:
     """检测是否在 Android 环境运行。"""
     try:
-        import android
+        import android  # noqa: F401
         return True
-    except ImportError:
+    except (ImportError, RuntimeError, OSError):
         return False
 
 
@@ -57,13 +57,27 @@ def main():
                 pygame.mixer.pre_init()
             except Exception as e2:
                 print(f"[main] pre_init 默认也失败，跳过音频: {e2}")
+        
+        # Android 14+ 需要在 pygame.init() 前设置环境变量
+        os.environ["SDL_VIDEO_FULLSCREEN"] = "1"
+        os.environ["SDL_HINT_ANDROID_BLOCK_ON_RESUME_PAUSE"] = "0"
+        
         pygame.init()
         # 检查音频是否初始化成功
         if not pygame.mixer.get_init():
             print("[main] 警告: pygame.mixer 未初始化，音频将不可用")
-        info = pygame.display.Info()
-        screen_width, screen_height = info.current_w, info.current_h
-        flags = pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF
+        # 安全获取屏幕尺寸（某些 Android 设备 Info() 可能异常）
+        try:
+            info = pygame.display.Info()
+            if info is None or info.current_w is None or info.current_h is None:
+                raise ValueError("Info() returned None")
+            screen_width, screen_height = info.current_w, info.current_h
+        except Exception as e:
+            print(f"[main] display.Info() 失败，使用默认分辨率: {e}")
+            screen_width, screen_height = 1920, 1080
+        # 移除 HWSURFACE/DOUBLEBUF/SCALED/FULLSCREEN（SDL2 已废弃，Android 14+ 上 FULLSCREEN 会崩溃）
+        # Android 默认全屏，不需要显式设置 FULLSCREEN
+        flags = 0
     else:
         # 桌面: 使用设计分辨率
         pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -132,9 +146,14 @@ def main():
             # 1. 渲染到虚拟画布
             scene.render(virtual_canvas)
             
-            # 2. 缩放并绘制到物理屏幕
+            # 2. 缩放并绘制到物理屏幕（smoothscale 在高分辨率 Android 上极易 OOM）
             screen.fill((0, 0, 0))  # 黑边填充
-            scaled_surface = pygame.transform.smoothscale(virtual_canvas, (int(VIRTUAL_WIDTH * scale), int(VIRTUAL_HEIGHT * scale)))
+            try:
+                scaled_surface = pygame.transform.scale(virtual_canvas, (int(VIRTUAL_WIDTH * scale), int(VIRTUAL_HEIGHT * scale)))
+            except Exception as e:
+                # fallback：直接 blit 不缩放
+                print(f"[main] scale 失败，使用原始尺寸: {e}")
+                scaled_surface = virtual_canvas
             screen.blit(scaled_surface, (offset_x, offset_y))
             
             pygame.display.flip()
