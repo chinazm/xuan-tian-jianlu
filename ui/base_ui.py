@@ -20,19 +20,38 @@ class FontManager:
     
     def _load_fonts(self):
         """加载字体文件。"""
-        # 尝试加载中文字体
+        # 1. 尝试加载指定字体文件
         if self._font_path and Path(self._font_path).exists():
             try:
                 self._default_font = pygame.font.Font(self._font_path, self._base_size)
-                return
+                if self._default_font is not None:
+                    return
             except Exception:
                 pass
         
-        # fallback 到系统字体
+        # 2. 尝试常见中文字体
+        for font_name in ["wqy-zenhei", "droid sans fallback", "sans-serif", "arial"]:
+            try:
+                font = pygame.font.SysFont(font_name, self._base_size)
+                if font is not None:
+                    self._default_font = font
+                    return
+            except Exception:
+                pass
+        
+        # 3. 尝试默认字体
         try:
-            self._default_font = pygame.font.SysFont("sans-serif", self._base_size)
+            font = pygame.font.Font(None, self._base_size)
+            if font is not None:
+                self._default_font = font
+                return
         except Exception:
-            self._default_font = pygame.font.Font(None, self._base_size)
+            pass
+        
+        # 4. 如果所有字体都失败，创建一个最小的 fallback surface
+        # 使用 pygame 内建字体（不会 crash）
+        print("[FontManager] 警告: 所有字体加载失败，使用 fallback 模式")
+        self._default_font = None
     
     @classmethod
     def get_instance(cls, font_path: str = None, base_size: int = 16) -> "FontManager":
@@ -51,7 +70,7 @@ class FontManager:
         self._scale = max(0.5, min(3.0, scale))
         self._font_cache.clear()
     
-    def get_font(self, size: int, bold: bool = False) -> pygame.font.Font:
+    def get_font(self, size: int, bold: bool = False) -> Optional[pygame.font.Font]:
         """获取指定大小的字体（带缓存）。"""
         scaled_size = int(size * self._scale)
         cache_key = (scaled_size, bold)
@@ -59,20 +78,43 @@ class FontManager:
         if cache_key in self._font_cache:
             return self._font_cache[cache_key]
         
+        font = None
+        
+        # 尝试从默认字体创建新大小
         if self._default_font:
             try:
                 font = pygame.font.Font(self._default_font.path, scaled_size)
-            except AttributeError:
+            except (AttributeError, Exception):
+                font = None
+        
+        # 尝试系统字体
+        if font is None:
+            for font_name in ["wqy-zenhei", "droid sans fallback", "sans-serif"]:
+                try:
+                    font = pygame.font.SysFont(font_name, scaled_size)
+                    if font is not None:
+                        break
+                except Exception:
+                    font = None
+        
+        # 尝试默认字体 None
+        if font is None:
+            try:
                 font = pygame.font.Font(None, scaled_size)
-        else:
-            font = pygame.font.Font(None, scaled_size)
+            except Exception:
+                font = None
         
         self._font_cache[cache_key] = font
         return font
     
     def render_text(self, text: str, size: int, color: tuple, bold: bool = False) -> pygame.Surface:
-        """渲染文字。"""
+        """渲染文字。如果字体不可用，返回一个空的透明 Surface。"""
         font = self.get_font(size, bold)
+        if font is None:
+            # Fallback: 创建一个空白 surface 避免 crash
+            surf = pygame.Surface((max(1, len(text) * size // 2), size), pygame.SRCALPHA)
+            surf.fill((0, 0, 0, 0))
+            return surf
         return font.render(text, True, color)
     
     @property

@@ -1,4 +1,5 @@
 """Android 系统适配器：通过 JNI 安全调用 Android 原生 API。"""
+import os
 
 
 class AndroidAdapter:
@@ -10,6 +11,11 @@ class AndroidAdapter:
     def __init__(self):
         self._available = False
         self._activity = None
+        self._context = None
+        # 先检查是否在 p4a 环境
+        if 'ANDROID_ARGUMENT' not in os.environ and 'ANDROID_APP_PATH' not in os.environ:
+            print("[AndroidAdapter] 非 Android 环境，跳过 JNI 初始化")
+            return
         try:
             from jnius import autoclass
             PythonActivity = autoclass('org.kivy.android.PythonActivity')
@@ -19,7 +25,7 @@ class AndroidAdapter:
             self._available = True
             print("[AndroidAdapter] JNI 环境已初始化")
         except Exception as e:
-            print(f"[AndroidAdapter] JNI 不可用 (桌面环境): {e}")
+            print(f"[AndroidAdapter] JNI 不可用 (安全跳过): {e}")
 
     def vibrate(self, duration_ms: int = 100):
         """触发设备震动。"""
