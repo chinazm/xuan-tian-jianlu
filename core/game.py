@@ -7,7 +7,7 @@ from core.vector import Vector2
 from core.input_handler import InputHandler
 from core.camera import Camera
 from core.event_bus import EventBus
-from core.resource_manager import ResourceManager
+from core.resource_manager import ResourceManager, get_base_dir
 from core.touch_controller import TouchController
 from core.performance import DynamicFPS
 from core.android_adapter import AndroidAdapter
@@ -50,7 +50,7 @@ class GameScene(Scene):
         super().__init__("game")
         self._config = config
         self._room_id = room_id
-        self._base_dir = base_dir
+        self._base_dir = Path(base_dir).resolve() if base_dir else get_base_dir()
         self._android_env = False
         self._state = GameState.PLAYING
         
@@ -58,13 +58,13 @@ class GameScene(Scene):
         self.input = InputHandler()
         self.camera = Camera(config.window.width, config.window.height)
         self.camera.smoothing = config.render.camera_smooth
-        self.resources = ResourceManager(base_path="assets", base_dir=base_dir)
+        self.resources = ResourceManager(base_path="assets", base_dir=self._base_dir)
         self.collision = CollisionSystem()
         self.combat = CombatSystem()
-        self.cultivation = CultivationSystem()
-        self.inventory = Inventory()
-        self.dialogue = DialogueSystem()
-        self.quest = QuestSystem()
+        self.inventory = Inventory(data_path=str(self._base_dir / "data" / "items.json"))
+        self.dialogue = DialogueSystem(data_path=str(self._base_dir / "data" / "dialogues.json"))
+        self.quest = QuestSystem(data_path=str(self._base_dir / "data" / "quests.json"))
+        self.cultivation = CultivationSystem(data_path=str(self._base_dir / "data" / "realms.json"))
         self.particles = ParticleSystem()
         self.audio = AudioManager()
         self._audio_ready = True  # 标记音频系统是否可用
@@ -136,13 +136,14 @@ class GameScene(Scene):
             self._android_env = False
 
     def _load_room(self, room_id: str, spawn_pos: Vector2 = None):
-        room = Room.from_json(f"maps/{room_id}.json")
+        room_path = self._base_dir / "maps" / f"{room_id}.json"
+        room = Room.from_json(str(room_path))
         if not room:
             return
         self.room = room
         self._room_id = room.room_id
         self.tilemap = Tilemap(self.resources, self._config.render.tile_size)
-        self.tilemap.load(f"maps/{room_id}.json", "tiles/tileset.png")
+        self.tilemap.load(str(room_path), "tiles/tileset.png")
         self.camera.set_bounds(self.tilemap.pixel_width, self.tilemap.pixel_height)
         self.collision = CollisionSystem()
         self.collision.set_terrain(self.tilemap.get_collision_rects())
@@ -185,7 +186,7 @@ class GameScene(Scene):
         EventBus.publish("room_enter", {"room_id": room.room_id})
 
         if room.music and self._audio_ready:
-            self.audio.play_music(f"assets/music/{room.music}")
+            self.audio.play_music(str(self._base_dir / "assets" / "music" / room.music))
 
     def _set_state(self, state: GameState):
         """切换游戏状态。"""
