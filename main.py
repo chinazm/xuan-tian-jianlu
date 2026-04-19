@@ -3,11 +3,88 @@
 """
 import sys
 import os
+import traceback
 import pygame
 import json
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
+
+# ============================================================
+# 全局崩溃捕获 — 在 Android 上把 traceback 写到可访问位置
+# ============================================================
+_CRASH_LOG_PATHS = []
+
+def _write_crash_log(exc_type, exc_value, exc_tb):
+    """把崩溃信息写到多个可能的位置，确保至少一个可访问。"""
+    lines = traceback.format_exception(exc_type, exc_value, exc_tb)
+    msg = "".join(lines)
+    
+    # 尝试多个位置
+    paths_to_try = []
+    
+    # Android 外部存储 (尝试多种 API)
+    try:
+        from android import storage
+        if hasattr(storage, 'primary_external_storage_path'):
+            sdcard = storage.primary_external_storage_path()
+        else:
+            sdcard = "/storage/emulated/0"
+        paths_to_try.append(os.path.join(sdcard, "xianxia_rpg_crash.log"))
+    except Exception:
+        pass
+    
+    # 常见位置
+    paths_to_try.append("/sdcard/xianxia_rpg_crash.log")
+    paths_to_try.append("/storage/emulated/0/xianxia_rpg_crash.log")
+    paths_to_try.append("/data/data/org.gaorong.xianxia_rpg/files/crash.log")
+    try:
+        paths_to_try.append(str(BASE_DIR / "crash.log"))
+    except Exception:
+        paths_to_try.append("./crash.log")
+    
+    # 也写到 stdout（会被 p4a 转发到 logcat）
+    print("=" * 60)
+    print("[CRASH] 游戏崩溃！")
+    print(msg)
+    print("=" * 60)
+    
+    for p in paths_to_try:
+        try:
+            with open(p, "w", encoding="utf-8") as f:
+                f.write("玄天剑录崩溃报告\n")
+                f.write("=" * 40 + "\n")
+                f.write(msg)
+                f.write("\n" + "=" * 40 + "\n")
+                f.write(f"尝试写入的位置:\n")
+                for tp in paths_to_try:
+                    f.write(f"  - {tp}\n")
+            _CRASH_LOG_PATHS.append(p)
+            print(f"[CRASH] 日志已写入: {p}")
+        except Exception:
+            pass
+
+def _install_crash_handler():
+    """安装全局异常钩子。"""
+    original = sys.excepthook
+    def hook(exc_type, exc_value, exc_tb):
+        _write_crash_log(exc_type, exc_value, exc_tb)
+        original(exc_type, exc_value, exc_tb)
+    sys.excepthook = hook
+    
+    # 也捕获 threading 异常
+    try:
+        import threading
+        original_thread = threading.excepthook
+        def thread_hook(args):
+            _write_crash_log(args.exc_type, args.exc_value, args.exc_traceback)
+            original_thread(args)
+        threading.excepthook = thread_hook
+    except Exception:
+        pass
+
+# 尽早安装崩溃钩子
+_install_crash_handler()
 
 # --- 设计分辨率 (虚拟画布) ---
 VIRTUAL_WIDTH = 800
@@ -55,8 +132,7 @@ def main():
     print(f"[main] Android 环境: {android_env}")
     
     if android_env:
-        # Android: 使用系统分辨率，全屏
-        # 先尝试安全初始化音频，某些 Android 设备不支持 pre_init 特定参数
+        # Android: 安全音频初始化
         try:
             pygame.mixer.pre_init(44100, -16, 2, 4096)
         except Exception as e:
@@ -66,7 +142,7 @@ def main():
             except Exception as e2:
                 print(f"[main] pre_init 默认也失败，跳过音频: {e2}")
         
-        # Android 14+ 需要在 pygame.init() 前设置环境变量
+        # Android 14+ SDL2 环境变量
         os.environ["SDL_VIDEO_FULLSCREEN"] = "1"
         os.environ["SDL_HINT_ANDROID_BLOCK_ON_RESUME_PAUSE"] = "0"
         
@@ -79,21 +155,16 @@ def main():
             traceback.print_exc()
             return
         
-        # 检查音频是否初始化成功
+        # 检查音频
         if not pygame.mixer.get_init():
             print("[main] 警告: pygame.mixer 未初始化，音频将不可用")
-        # 安全获取屏幕尺寸（某些 Android 设备 Info() 可能异常）
-        try:
-            info = pygame.display.Info()
-            if info is None or info.current_w is None or info.current_h is None:
-                raise ValueError("Info() returned None")
-            screen_width, screen_height = info.current_w, info.current_h
-            print(f"[main] 屏幕分辨率: {screen_width}x{screen_height}")
-        except Exception as e:
-            print(f"[main] display.Info() 失败，使用默认分辨率: {e}")
-            screen_width, screen_height = 1920, 1080
-        # 移除 HWSURFACE/DOUBLEBUF/SCALED/FULLSCREEN（SDL2 已废弃，Android 14+ 上 FULLSCREEN 会崩溃）
-        # Android 默认全屏，不需要显式设置 FULLSCREEN
+        
+        # 【关键修复】先 set_mode 再 Info() — 在 Android 上 Info() 在 set_mode 前返回 None 会导致 crash
+        # 使用固定安全分辨率（虚拟画布会自动缩放）
+        screen_width, screen_height = 1280, 720
+        print(f"[main] Android 使用安全分辨率: {screen_width}x{screen_height}")
+        
+        # 移除废弃 flags
         flags = 0
     else:
         # 桌面: 使用设计分辨率

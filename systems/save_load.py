@@ -16,7 +16,7 @@ def get_save_dir() -> Path:
         # Android 环境下使用当前工作目录（p4a 设置为应用私有目录）
         import os
         return Path(os.getcwd()) / "saves"
-    except ImportError:
+    except (ImportError, RuntimeError, OSError):
         # 桌面环境使用相对路径
         return Path("saves")
 
