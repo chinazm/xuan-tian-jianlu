@@ -9,6 +9,27 @@ import json
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
+import time
+
+def _show_crash_screen(msg):
+    """Draw crash message on screen and wait 3 seconds."""
+    try:
+        import pygame
+        screen = pygame.display.get_surface()
+        if screen:
+            screen.fill((200, 0, 0)) # Red background
+            # Use internal font to avoid font loading crash
+            f = pygame.font.Font(None, 24)
+            lines = msg.split('\n')
+            for i, line in enumerate(lines):
+                if i > 12: break # Limit lines
+                txt = f.render(line, True, (255, 255, 255))
+                screen.blit(txt, (20, 30 + i * 30))
+            pygame.display.flip()
+    except:
+        pass
+    time.sleep(3)
+
 
 # ============================================================
 # 全局崩溃捕获 — 在 Android 上把 traceback 写到可访问位置
@@ -98,11 +119,14 @@ def load_settings() -> dict:
         with open(settings_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        print(f"错误: 找不到配置文件 {settings_path}")
-        sys.exit(1)
+        print(f"[main] 警告: 找不到配置文件 {settings_path}，使用默认设置")
+        return {"window": {"title": "玄天剑录", "fps": 60}}
     except json.JSONDecodeError as e:
-        print(f"错误: 配置文件 JSON 格式错误: {e}")
-        sys.exit(1)
+        print(f"[main] 警告: 配置文件 JSON 格式错误: {e}，使用默认设置")
+        return {"window": {"title": "玄天剑录", "fps": 60}}
+    except Exception as e:
+        print(f"[main] 警告: 读取配置文件失败: {e}，使用默认设置")
+        return {"window": {"title": "玄天剑录", "fps": 60}}
 
 
 def is_android() -> bool:
@@ -120,7 +144,7 @@ def main():
     except Exception as e:
         import traceback
         print(f"[FATAL] load_settings failed: {e}")
-        traceback.print_exc()
+        _show_crash_screen(f"CRASH: load_settings\n{e}")
         return
     
     win_cfg = settings.get("window", {})
@@ -262,7 +286,8 @@ def main():
     except Exception as e:
         print(f"[FATAL] 游戏运行异常: {e}")
         import traceback
-        traceback.print_exc()
+        err = traceback.format_exc()
+        _show_crash_screen(f"CRASH: Game Loop\n{e}\n{err}")
         try:
             pygame.quit()
         except Exception:
