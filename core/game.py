@@ -67,6 +67,16 @@ class GameScene(Scene):
         self.quest = QuestSystem()
         self.particles = ParticleSystem()
         self.audio = AudioManager()
+        self._audio_ready = True  # 标记音频系统是否可用
+        
+        # 检查 pygame.mixer 是否可用
+        try:
+            if not pygame.mixer.get_init():
+                self._audio_ready = False
+                print("[GameScene] pygame.mixer 未初始化，音频已禁用")
+        except Exception:
+            self._audio_ready = False
+            print("[GameScene] pygame.mixer 检查失败，音频已禁用")
         
         # 触屏控制器
         self.touch = TouchController(config.window.width, config.window.height)
@@ -174,7 +184,7 @@ class GameScene(Scene):
         self.quest.start_quest("MAIN_CH01_001")
         EventBus.publish("room_enter", {"room_id": room.room_id})
 
-        if room.music:
+        if room.music and self._audio_ready:
             self.audio.play_music(f"assets/music/{room.music}")
 
     def _set_state(self, state: GameState):

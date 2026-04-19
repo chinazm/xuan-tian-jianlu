@@ -48,8 +48,19 @@ def main():
     
     if android_env:
         # Android: 使用系统分辨率，全屏
-        pygame.mixer.pre_init(44100, -16, 2, 4096)
+        # 先尝试安全初始化音频，某些 Android 设备不支持 pre_init 特定参数
+        try:
+            pygame.mixer.pre_init(44100, -16, 2, 4096)
+        except Exception as e:
+            print(f"[main] pre_init 失败，尝试默认: {e}")
+            try:
+                pygame.mixer.pre_init()
+            except Exception as e2:
+                print(f"[main] pre_init 默认也失败，跳过音频: {e2}")
         pygame.init()
+        # 检查音频是否初始化成功
+        if not pygame.mixer.get_init():
+            print("[main] 警告: pygame.mixer 未初始化，音频将不可用")
         info = pygame.display.Info()
         screen_width, screen_height = info.current_w, info.current_h
         flags = pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF
